@@ -466,7 +466,9 @@ theorem splitAux_of_valid (p l m r acc) :
     splitAux ⟨l ++ m ++ r⟩ p ⟨utf8Len l⟩ ⟨utf8Len l + utf8Len m⟩ acc =
       acc.reverse ++ (List.splitOnP.go p r m.reverse).map mk := by
   unfold splitAux
-  simp [by simpa using atEnd_of_valid (l ++ m) r]; split
+  simp [show utf8Len l + (utf8Len m + utf8Len r) ≤ utf8Len l + utf8Len m ↔ r = [] from by
+    simpa using atEnd_of_valid (l ++ m) r]
+  split
   · subst r; simpa [List.splitOnP.go] using extract_of_valid l m []
   · obtain ⟨c, r, rfl⟩ := r.exists_cons_of_ne_nil ‹_›
     simp [by simpa using (⟨get_of_valid (l++m) (c::r), next_of_valid (l++m) c r,
